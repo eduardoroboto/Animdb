@@ -1,4 +1,4 @@
-package com.mdb.Animdb.interfaces;
+package com.mdb.Animdb.model.productions;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import netscape.javascript.JSObject;

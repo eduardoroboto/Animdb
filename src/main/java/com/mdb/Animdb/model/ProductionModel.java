@@ -1,9 +1,9 @@
 package com.mdb.Animdb.model;
 
-import com.mdb.Animdb.enums.Format;
-import com.mdb.Animdb.enums.Genres;
-import com.mdb.Animdb.enums.Status;
-import com.mdb.Animdb.enums.Themes;
+import com.mdb.Animdb.model.productions.Format;
+import com.mdb.Animdb.model.productions.Genres;
+import com.mdb.Animdb.model.productions.Status;
+import com.mdb.Animdb.model.productions.Themes;
 
 import java.util.ArrayList;
 import java.util.Date;

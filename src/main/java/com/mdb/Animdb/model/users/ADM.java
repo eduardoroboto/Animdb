@@ -1,9 +1,7 @@
 package com.mdb.Animdb.model.users;
 
-import com.mdb.Animdb.interfaces.Production;
-import com.mdb.Animdb.interfaces.User;
+import com.mdb.Animdb.model.productions.Production;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

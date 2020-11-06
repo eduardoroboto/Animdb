@@ -1,7 +1,6 @@
 package com.mdb.Animdb;
 
-import com.mdb.Animdb.enums.Status;
-import com.mdb.Animdb.interfaces.User;
+import com.mdb.Animdb.model.productions.Status;
 import com.mdb.Animdb.model.productions.Anime;
 import com.mdb.Animdb.model.productions.Filme;
 import com.mdb.Animdb.model.productions.Serie;

@@ -1,8 +1,5 @@
 package com.mdb.Animdb.model.productions;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.mdb.Animdb.enums.*;
-import com.mdb.Animdb.interfaces.Production;
 import com.mdb.Animdb.model.ProductionModel;
 import org.json.JSONException;
 import org.json.JSONObject;
