@@ -1,9 +1,5 @@
 package com.mdb.Animdb.model.productions;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.mdb.Animdb.enums.*;
-import com.mdb.Animdb.interfaces.Production;
-import com.mdb.Animdb.model.ProductionModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,16 +11,16 @@ public class Anime extends ProductionModel implements Production {
     private Demography demography;
 
 
-    public Anime(String title, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
+    public Anime(String title,String Id, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
                  ArrayList<Themes> themes, String author, ArrayList<String> cast, Format format, int episodes, Demography demography) {
-        super(title, synopsis, status, releaseDate, geners, themes, author, cast, format);
+        super(title, Id, synopsis, status, releaseDate, geners, themes, author, cast, format);
         this.episodes = episodes;
         this.demography = demography;
     }
 
 
     public Anime(Builder builder){
-        super(builder.modelTitle, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
+        super(builder.modelTitle,builder.modelId, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
                 builder.modelThemes, builder.modelAuthor, builder.modelCast, builder.modelFormat);
         this.episodes = builder.modelEpisodes;
         this.demography = builder.modelDemography;
@@ -35,6 +31,7 @@ public class Anime extends ProductionModel implements Production {
         protected Demography modelDemography = Demography.Shounen;
 
         protected String modelTitle = "Null";
+        protected String modelId = "Null";
         protected String modelSynopsis = "Null";
         protected Status modelStatus = Status.NotYetReleased;
         protected Date modelReleaseDate = null;
@@ -56,6 +53,11 @@ public class Anime extends ProductionModel implements Production {
 
         public Builder setModelTitle(String modelTitle) {
             this.modelTitle = modelTitle;
+            return this;
+        }
+
+        public Builder setModelId(String modelId) {
+            this.modelId = modelId;
             return this;
         }
 
@@ -118,6 +120,7 @@ public class Anime extends ProductionModel implements Production {
                 ", author='" + author + '\'' +
                 ", cast=" + cast +
                 ", format=" + format +
+                ", Id='" + Id + '\'' +
                 ", rating=" + rating +
                 '}';
     }
@@ -127,6 +130,7 @@ public class Anime extends ProductionModel implements Production {
 
         JSONObject animeJson = new JSONObject();
         animeJson.put("title",title);
+        animeJson.put("Id",Id);
         animeJson.put("episodes",episodes);
         animeJson.put("demography",demography);
         animeJson.put("synopsis",synopsis);

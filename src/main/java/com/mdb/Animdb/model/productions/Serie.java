@@ -1,12 +1,5 @@
 package com.mdb.Animdb.model.productions;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.mdb.Animdb.enums.Format;
-import com.mdb.Animdb.enums.Genres;
-import com.mdb.Animdb.enums.Status;
-import com.mdb.Animdb.enums.Themes;
-import com.mdb.Animdb.interfaces.Production;
-import com.mdb.Animdb.model.ProductionModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,23 +7,26 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Serie extends ProductionModel implements Production {
+
     private int episodes;
 
-    public Serie(String title, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
+    public Serie(String title, String Id, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
                  ArrayList<Themes> themes, String author, ArrayList<String> cast, Format format, int episodes) {
-        super(title, synopsis, status, releaseDate, geners, themes, author, cast, format);
+        super(title, Id, synopsis, status, releaseDate, geners, themes, author, cast, format);
         this.episodes = episodes;
     }
 
-    public Serie(Builder builder){
-        super(builder.modelTitle, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
+    public Serie(Builder builder) {
+        super(builder.modelTitle, builder.modelId, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
                 builder.modelThemes, builder.modelAuthor, builder.modelCast, builder.modelFormat);
         this.episodes = builder.modelEpisodes;
     }
-    public static class Builder{
+
+    public static class Builder {
         protected int modelEpisodes = 0;
 
         protected String modelTitle = "Null";
+        protected String modelId = "Null";
         protected String modelSynopsis = "Null";
         protected Status modelStatus = Status.NotYetReleased;
         protected Date modelReleaseDate = null;
@@ -47,6 +43,11 @@ public class Serie extends ProductionModel implements Production {
 
         public Builder setModelTitle(String modelTitle) {
             this.modelTitle = modelTitle;
+            return this;
+        }
+
+        public Builder setModelId(String modelId) {
+            this.modelId = modelId;
             return this;
         }
 
@@ -90,7 +91,7 @@ public class Serie extends ProductionModel implements Production {
             return this;
         }
 
-        public Serie build(){
+        public Serie build() {
             return new Serie(this);
         }
     }
@@ -108,25 +109,27 @@ public class Serie extends ProductionModel implements Production {
                 ", author='" + author + '\'' +
                 ", cast=" + cast +
                 ", format=" + format +
+                ", Id='" + Id + '\'' +
                 ", rating=" + rating +
                 '}';
     }
 
     @Override
-    public JSONObject getAll()  throws JSONException {
+    public JSONObject getAll() throws JSONException {
 
         JSONObject seriesJson = new JSONObject();
-        seriesJson.put("title",title);
-        seriesJson.put("episodes",episodes);
-        seriesJson.put("synopsis",synopsis);
-        seriesJson.put("status" , status);
-        seriesJson.put("releaseDate" , releaseDate);
-        seriesJson.put("geners" , geners);
-        seriesJson.put("themes" , themes);
-        seriesJson.put("author" , author);
-        seriesJson.put("cast" , cast);
-        seriesJson.put("format" , format);
-        seriesJson.put("rating" , rating);
+        seriesJson.put("title", title);
+        seriesJson.put("Id", Id);
+        seriesJson.put("episodes", episodes);
+        seriesJson.put("synopsis", synopsis);
+        seriesJson.put("status", status);
+        seriesJson.put("releaseDate", releaseDate);
+        seriesJson.put("geners", geners);
+        seriesJson.put("themes", themes);
+        seriesJson.put("author", author);
+        seriesJson.put("cast", cast);
+        seriesJson.put("format", format);
+        seriesJson.put("rating", rating);
 
         return seriesJson;
     }

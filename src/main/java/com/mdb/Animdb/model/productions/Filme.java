@@ -1,12 +1,5 @@
 package com.mdb.Animdb.model.productions;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.mdb.Animdb.enums.Format;
-import com.mdb.Animdb.enums.Genres;
-import com.mdb.Animdb.enums.Status;
-import com.mdb.Animdb.enums.Themes;
-import com.mdb.Animdb.interfaces.Production;
-import com.mdb.Animdb.model.ProductionModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,14 +10,14 @@ public class Filme extends ProductionModel implements Production {
     private int duration;
 
 
-    public Filme(String title, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
+    public Filme(String title,String Id, String synopsis, Status status, Date releaseDate, ArrayList<Genres> geners,
                  ArrayList<Themes> themes, String author, ArrayList<String> cast, Format format, int duration) {
-        super(title, synopsis, status, releaseDate, geners, themes, author, cast, format);
+        super(title,Id, synopsis, status, releaseDate, geners, themes, author, cast, format);
         this.duration = duration;
     }
 
     public Filme(Builder builder){
-        super(builder.modelTitle, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
+        super(builder.modelTitle,builder.modelId, builder.modelSynopsis, builder.modelStatus, builder.modelReleaseDate, builder.modelGeners,
                 builder.modelThemes, builder.modelAuthor, builder.modelCast, builder.modelFormat);
         this.duration = builder.modelDuration;
     }
@@ -33,6 +26,7 @@ public class Filme extends ProductionModel implements Production {
         protected int modelDuration = 0;
 
         protected String modelTitle = "Null";
+        protected String modelId = "Null";
         protected String modelSynopsis = "Null";
         protected Status modelStatus = Status.NotYetReleased;
         protected Date modelReleaseDate = null;
@@ -49,6 +43,11 @@ public class Filme extends ProductionModel implements Production {
 
         public Builder setModelTitle(String modelTitle) {
             this.modelTitle = modelTitle;
+            return this;
+        }
+
+        public Builder setModelId(String modelId) {
+            this.modelId = modelId;
             return this;
         }
 
@@ -110,6 +109,7 @@ public class Filme extends ProductionModel implements Production {
                 ", author='" + author + '\'' +
                 ", cast=" + cast +
                 ", format=" + format +
+                ", Id='" + Id + '\'' +
                 ", rating=" + rating +
                 '}';
     }
@@ -118,6 +118,7 @@ public class Filme extends ProductionModel implements Production {
     public JSONObject getAll()  throws JSONException {
         JSONObject filmeJson = new JSONObject();
         filmeJson.put("title",title);
+        filmeJson.put("Id",Id);
         filmeJson.put("duration",duration);
         filmeJson.put("synopsis",synopsis);
         filmeJson.put("status",status);
