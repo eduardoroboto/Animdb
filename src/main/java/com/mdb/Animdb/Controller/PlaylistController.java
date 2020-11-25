@@ -49,7 +49,7 @@ public class PlaylistController {
 
     @GetMapping("/{id}") // getPlaylist
     public String getPlaylist(@PathVariable("id") String id,
-                                         @RequestParam(value = "name", required = false) String name) throws JSONException {
+                              @RequestParam(value = "name", required = false) String name) throws JSONException {
         Usuario user = (Usuario) db.returnUser(id);
         JSONObject playlist = new JSONObject();
 
