@@ -6,6 +6,8 @@ import com.mdb.Animdb.model.users.Usuario;
 import netscape.javascript.JSObject;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,8 +25,8 @@ public class PlaylistController {
     }
 
     @PostMapping("/{id}")
-    public void postPlaylist(@PathVariable("id") String id,
-                             @RequestBody ObjectNode objectNode) {
+    public ResponseEntity<?> postPlaylist(@PathVariable("id") String id,
+                                       @RequestBody ObjectNode objectNode) {
 
         String playlist_name = objectNode.get("playlist_name").asText();
 
@@ -32,11 +34,13 @@ public class PlaylistController {
         Usuario user = (Usuario) db.returnUser(id);
         user.createList(playlist_name);
 
+        return new ResponseEntity(HttpStatus.OK);
+
 
     }
 
     @PatchMapping("/{id}") //alterar nome
-    public void changePlaylist(@PathVariable("id") String id,
+    public ResponseEntity<?> changePlaylist(@PathVariable("id") String id,
                                @RequestBody ObjectNode name_change) {
 
         String old_name = name_change.get("old_name").asText();
@@ -44,11 +48,12 @@ public class PlaylistController {
 
         Usuario user = (Usuario) db.returnUser(id);
         user.renamePlaylist(old_name, new_name);
+        return new ResponseEntity(HttpStatus.OK);
 
     }
 
     @GetMapping("/{id}") // getPlaylist
-    public String getPlaylist(@PathVariable("id") String id,
+    public ResponseEntity<String> getPlaylist(@PathVariable("id") String id,
                               @RequestParam(value = "name", required = false) String name) throws JSONException {
         Usuario user = (Usuario) db.returnUser(id);
         JSONObject playlist = new JSONObject();
@@ -58,19 +63,22 @@ public class PlaylistController {
                 System.out.println(playname);
                 playlist.put(playname, user.returnPlaylist(playname));
             }
-            return playlist.toString();
+            return new ResponseEntity<>(playlist.toString(),HttpStatus.OK);
         } else {
             playlist.put(name, user.returnPlaylist(name));
-            return playlist.toString();
+            return new ResponseEntity<>(playlist.toString(),HttpStatus.OK);
         }
+        //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePlaylist(@PathVariable("id") String id,
+    public ResponseEntity<?> deletePlaylist(@PathVariable("id") String id,
                                @RequestParam(value = "name") String name) {
         Usuario user = (Usuario) db.returnUser(id);
         user.deletePlaylist(name);
         System.out.println("Delete --> " + " ID = " + id);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
