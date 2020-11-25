@@ -7,6 +7,8 @@ import com.mdb.Animdb.model.users.ADM;
 import com.mdb.Animdb.model.users.User;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,14 +26,15 @@ public class ADMController {
 
     // add a new admin
     @PostMapping
-    public void addNewADM(@RequestBody ADM adm) {
+    public ResponseEntity<?> addNewADM(@RequestBody ADM adm) {
         db.addUser(adm);
         System.out.println("Post -> " + adm.toString());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // change admin info
     @PutMapping("/{id}")
-    public void changeADM(@PathVariable("id") String id,
+    public ResponseEntity<?> changeADM(@PathVariable("id") String id,
                           @RequestHeader String session_id,
                           @RequestBody ADM adm) {
 
@@ -42,20 +45,25 @@ public class ADMController {
             db.deleteUser(id);
             db.addUser(adm);
             System.out.println("Changing account ID --> +" + id + " by the Admin " + user.getId());
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         if (user.getId().equals(adm.getId())) {
 
             db.deleteUser(id);
             db.addUser(adm);
             System.out.println("Changing account ID --> +" + id);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+
         }
 
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     }
 
     //Get all Admin information
     @GetMapping //http://localhost:8080/administradores?id=021
-    public String getADM(@RequestParam(value = "id", required = false) String id,
+    public ResponseEntity<String> getADM(@RequestParam(value = "id", required = false) String id,
                          @RequestHeader String session_id) throws JSONException {
         if (id == null) {
             if (session_id.equals("000")) {
@@ -68,9 +76,9 @@ public class ADMController {
                         jj.put(user.getId(), user.getAll());
                     }
                 }
-                return jj.toString();
+                return new ResponseEntity<String>(jj.toString(),HttpStatus.OK);
             }
-            return "Not Authorized";
+            return new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
         } else {
             if(session_id.equals("000") || session_id.equals(id)){
@@ -79,26 +87,29 @@ public class ADMController {
                 JSONObject one = new JSONObject();
                 User user = db.returnUser(id);
                 one.put(user.getId(), user.getAll());
-                return one.toString();
+                return new ResponseEntity<String>(one.toString(),HttpStatus.OK);
             }
 
         }
-        return "Not Authorized";
+        return new ResponseEntity(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteADM(@PathVariable("id") String id,
+    public ResponseEntity<?> deleteADM(@PathVariable("id") String id,
                           @RequestHeader("session_id") String session_id) {
 
         User user = db.returnUser(session_id);
         if (check.checkAdmin(user) && user.getId().equals("000")) {
             db.deleteUser(id);
             System.out.println("Admin Delete --> " + " ID = " + id);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         if (user.getId().equals(id)) {
             db.deleteUser(id);
             System.out.println("Admin Delete Itself--> " + " ID = " + id);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         System.out.println("Delete --> " + " ID = " + id);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

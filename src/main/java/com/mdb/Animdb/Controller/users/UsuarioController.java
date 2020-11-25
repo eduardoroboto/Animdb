@@ -6,6 +6,8 @@ import com.mdb.Animdb.model.users.Usuario;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mdb.Animdb.Controller.checkPrivilege;
 
@@ -24,13 +26,14 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public void postUser(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> apostUser(@RequestBody Usuario usuario) {
         db.addUser(usuario);
         System.out.println("Adding +" + usuario );
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public void changeUser(@PathVariable("id") String id,
+    public  ResponseEntity<?> changeUser(@PathVariable("id") String id,
                            @RequestHeader String session_id,
                            @RequestBody Usuario usuario) {
 
@@ -40,19 +43,23 @@ public class UsuarioController {
             db.deleteUser(id);
             db.addUser(usuario);
             System.out.println("Changing account ID --> +" + id + " by the Admin " + user.getId());
+           return new ResponseEntity<>(HttpStatus.OK);
         }
-        if(user.getId().equals(usuario.getId())){
+        if(user.getId().equals(usuario.getId()) && session_id.equals(id)){
 
             db.deleteUser(id);
             db.addUser(usuario);
 
+            return new ResponseEntity<>(HttpStatus.OK);
+
         }
 
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     }
 
     @GetMapping //http://localhost:8080/usuarios?id=021
-    public String getUser(@RequestParam(value = "id", required = false) String id,
+    public  ResponseEntity<String> getUser(@RequestParam(value = "id", required = false) String id,
                           @RequestHeader String session_id) throws JSONException {
         User session_user = db.returnUser(session_id);
         if (id == null) {
@@ -66,34 +73,35 @@ public class UsuarioController {
                         jj.put(user.getId(),user.getAll());
                     }
                 }
-                return jj.toString();
+                return new ResponseEntity<String>(jj.toString(),HttpStatus.OK);
             }
         } else {
             if(check.checkAdmin(session_user) || session_id.equals(id)){
-
                 System.out.println("Return User --> " + " ID = " + id);
                 JSONObject one = new JSONObject();
                 User user = db.returnUser(id);
                 one.put(user.getId(),user.getAll());
-                return one.toString();
+                return new ResponseEntity<String>(one.toString(),HttpStatus.OK);
             }
         }
-        return "Not Authorized";
+        return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") String id,
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id,
                            @RequestHeader("session_id") String session_id) {
 
         User user = db.returnUser(session_id);
         if(check.checkAdmin(user)){
             db.deleteUser(id);
             System.out.println("Admin Delete --> " + " ID = " + id);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         if(user.getId().equals(id)){
             db.deleteUser(id);
             System.out.println("User Delete itself--> " + " ID = " + id);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
-
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }
