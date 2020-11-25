@@ -29,11 +29,11 @@ public class fakeDB {
         return null;
     }
 
-    public Production returnProduction(String name) {
+    public Production returnProduction(String id) {
 
         for (Production production  : this.productions) {
-            String title = production.getTitle();
-            if (name.equals(title)) {
+            String productionId = production.getId();
+            if (id.equals(productionId)) {
                 return production;
             }
         }
@@ -48,9 +48,9 @@ public class fakeDB {
 
     }
 
-    public Production deleteProduction(String name){
+    public Production deleteProduction(String Id){
 
-        Production production = returnProduction(name);
+        Production production = returnProduction(Id);
         this.productions.remove(production);
         return production;
     }
