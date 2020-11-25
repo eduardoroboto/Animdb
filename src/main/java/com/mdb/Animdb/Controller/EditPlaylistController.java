@@ -26,7 +26,7 @@ public class EditPlaylistController {
 
         Usuario user = (Usuario) db.returnUser(id);
         Production production = db.returnProduction(title);
-        user.addProductions(playlist_name,production);
+        user.addProductions(playlist_name,title);
 
         System.out.println("Adding " + title+ " --> " + "to the playlist " + playlist_name);
     }
