@@ -2,6 +2,8 @@ package com.mdb.Animdb.Controller.productions;
 
 import com.mdb.Animdb.model.fakeDB;
 import com.mdb.Animdb.model.productions.Serie;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,20 +18,24 @@ public class SerieController {
     }
 
     @PostMapping
-    public void postSerie(@RequestBody Serie serie){
+    public ResponseEntity<?> postSerie(@RequestBody Serie serie){
         db.addProduction(serie);
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
     @PutMapping("/{id}")
-    public void changeSerie(@PathVariable("id") String id,
+    public ResponseEntity<?> changeSerie(@PathVariable("id") String id,
                             @RequestBody  Serie serie){
         db.deleteProduction(id);
         db.addProduction(serie);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteSerie(@PathVariable("id") String id){
+    public ResponseEntity<?> deleteSerie(@PathVariable("id") String id){
         db.deleteProduction(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 }

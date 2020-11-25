@@ -3,6 +3,8 @@ package com.mdb.Animdb.Controller.productions;
 import com.mdb.Animdb.model.fakeDB;
 import com.mdb.Animdb.model.productions.Anime;
 import com.mdb.Animdb.model.productions.Filme;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,20 +19,26 @@ public class FilmeController {
     }
 
     @PostMapping
-    public void postFilme(@RequestBody Filme filme){
+    public ResponseEntity<?> postFilme(@RequestBody Filme filme){
         db.addProduction(filme);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public void changeFilme(@PathVariable("id") String id,
+    public ResponseEntity<?> changeFilme(@PathVariable("id") String id,
                             @RequestBody  Filme filme){
         db.deleteProduction(id);
         db.addProduction(filme);
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFilme(@PathVariable("id") String id){
+    public ResponseEntity<?> deleteFilme(@PathVariable("id") String id){
         db.deleteProduction(id);
+
+        return new ResponseEntity(HttpStatus.OK);
+
     }
 
 }
