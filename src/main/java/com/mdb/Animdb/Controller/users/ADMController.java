@@ -1,104 +1,88 @@
 package com.mdb.Animdb.Controller.users;
 
 
-import com.mdb.Animdb.Controller.checkPrivilege;
-import com.mdb.Animdb.model.fakeDB;
+import com.mdb.Animdb.model.services.AdminService;
 import com.mdb.Animdb.model.users.ADM;
-import com.mdb.Animdb.model.users.User;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+// TODO Modificar os returns para retornar mensagens HTTP
 
 @RestController
 @RequestMapping("/admin")
 public class ADMController {
 
 
-    private fakeDB db;
-    private checkPrivilege check = new checkPrivilege();
+    private final AdminService adminService;
 
-    public ADMController(fakeDB db) {
-        this.db = db;
+    public ADMController(AdminService adminService) {
+
+        this.adminService = adminService;
     }
 
 
     // add a new admin
     @PostMapping
-    public void addNewADM(@RequestBody ADM adm) {
-        db.addUser(adm);
-        System.out.println("Post -> " + adm.toString());
+    public ADM addNewADM(@RequestBody ADM adm) {
+
+        return adminService.save(adm);
+       // System.out.println("Post -> " + adm.toString());
     }
 
-    // change admin info
-    @PutMapping("/{id}")
-    public void changeADM(@PathVariable("id") String id,
-                          @RequestHeader String session_id,
+    @PutMapping("/me") //http://localhost:8080/admin/me
+    public void changeADM(@RequestHeader Integer session_id,
                           @RequestBody ADM adm) {
 
-
-        User user = db.returnUser(session_id);
-        if (check.checkAdmin(user) && user.getId().equals("000")) {
-
-            db.deleteUser(id);
-            db.addUser(adm);
-            System.out.println("Changing account ID --> +" + id + " by the Admin " + user.getId());
-        }
-        if (user.getId().equals(adm.getId())) {
-
-            db.deleteUser(id);
-            db.addUser(adm);
-            System.out.println("Changing account ID --> +" + id);
+            adminService.update(session_id,adm);
+            System.out.println("Update Admin account ID --> +" + session_id);
         }
 
+
+    // change admin info
+    @PutMapping("/{id}") //http://localhost:8080/admin?id=21
+    public void changeADM(@PathVariable("id") Integer id,
+                          @RequestHeader Integer session_id,
+                          @RequestBody ADM adm) {
+
+        if (adminService.getAdmin(session_id).isPresent() && session_id.equals(1)) {
+            adminService.update(id,adm);
+            System.out.println("Changing Admin account ID --> +" + id + " by the Master Admin ");
+        }
 
     }
 
-    //Get all Admin information
-    @GetMapping //http://localhost:8080/administradores?id=021
-    public String getADM(@RequestParam(value = "id", required = false) String id,
-                         @RequestHeader String session_id) throws JSONException {
-        if (id == null) {
-            if (session_id.equals("000")) {
+    //Get my Admin information
+    @GetMapping("/me") //http://localhost:8080/admin/me
+    public Optional<ADM> getMyADM(@RequestHeader Integer session_id)  {
 
-                System.out.println("GetAll!");
-                System.out.println(db.getAllUsers());
-                JSONObject jj = new JSONObject();
-                for (User user : db.getAllUsers()) {
-                    if (check.checkAdmin(user)) {
-                        jj.put(user.getId(), user.getAll());
-                    }
-                }
-                return jj.toString();
+        return adminService.getAdmin(session_id);
+
+    }
+    //Get Another Admin information
+    @GetMapping //http://localhost:8080/admin?id=021
+    public Optional<ADM> getADM(@RequestParam(value = "id") Integer id,
+                         @RequestHeader Integer session_id) {
+            if (adminService.getAdmin(session_id).isPresent() && session_id.equals(1)) {
+                return adminService.getAdmin(id);
             }
-            return "Not Authorized";
-
-        } else {
-            if(session_id.equals("000") || session_id.equals(id)){
-
-                System.out.println("Return User --> " + " ID = " + id);
-                JSONObject one = new JSONObject();
-                User user = db.returnUser(id);
-                one.put(user.getId(), user.getAll());
-                return one.toString();
-            }
-
-        }
-        return "Not Authorized";
+        return adminService.getAdmin(-1);
     }
 
+    @DeleteMapping("/me")
+    public void deleteADM(@RequestHeader("session_id" ) Integer session_id) {
+
+            adminService.delete(session_id);
+            System.out.println("Admin Delete Itself--> " + " ID = " + session_id);
+
+    }
     @DeleteMapping("/{id}")
-    public void deleteADM(@PathVariable("id") String id,
-                          @RequestHeader("session_id") String session_id) {
+    public void deleteADM(@PathVariable("id") Integer id,
+                          @RequestHeader("session_id") Integer session_id) {
 
-        User user = db.returnUser(session_id);
-        if (check.checkAdmin(user) && user.getId().equals("000")) {
-            db.deleteUser(id);
-            System.out.println("Admin Delete --> " + " ID = " + id);
+        if (adminService.getAdmin(session_id).isPresent() && session_id.equals(1)) {
+            adminService.delete(id);
+            System.out.println("Admin Deleted by Admin Master --> " + " ID = " + id);
         }
-        if (user.getId().equals(id)) {
-            db.deleteUser(id);
-            System.out.println("Admin Delete Itself--> " + " ID = " + id);
-        }
-        System.out.println("Delete --> " + " ID = " + id);
     }
 }

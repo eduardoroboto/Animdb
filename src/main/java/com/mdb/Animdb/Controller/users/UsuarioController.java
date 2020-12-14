@@ -1,99 +1,86 @@
 package com.mdb.Animdb.Controller.users;
 
-import com.mdb.Animdb.model.fakeDB;
-import com.mdb.Animdb.model.users.User;
+import com.mdb.Animdb.model.services.AdminService;
+import com.mdb.Animdb.model.services.UsuarioService;
 import com.mdb.Animdb.model.users.Usuario;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
-import com.mdb.Animdb.Controller.checkPrivilege;
 
-import java.util.ArrayList;
+import java.util.Optional;
+import java.util.List;
 
+// TODO Modificar os returns para retornar mensagens HTTP
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    private fakeDB db;
-    private checkPrivilege check = new checkPrivilege();
+    private final UsuarioService usuarioService;
+    private final AdminService adminService;
 
-    public UsuarioController(fakeDB db){
-        this.db = db;
+    public UsuarioController( UsuarioService usuarioService, AdminService adminService){
+
+        this.usuarioService = usuarioService;
+        this.adminService = adminService;
     }
 
     @PostMapping
     public void postUser(@RequestBody Usuario usuario) {
-        db.addUser(usuario);
+        usuarioService.save(usuario);
         System.out.println("Adding +" + usuario );
     }
 
-    @PutMapping("/{id}")
-    public void changeUser(@PathVariable("id") String id,
-                           @RequestHeader String session_id,
+    @PutMapping("/me")
+    public void changeMyUser(@RequestHeader Integer session_id,
                            @RequestBody Usuario usuario) {
-
-        User user = db.returnUser(session_id);
-        if(check.checkAdmin(user)){
-
-            db.deleteUser(id);
-            db.addUser(usuario);
-            System.out.println("Changing account ID --> +" + id + " by the Admin " + user.getId());
-        }
-        if(user.getId().equals(usuario.getId())){
-
-            db.deleteUser(id);
-            db.addUser(usuario);
-
-        }
-
-
+            usuarioService.update(session_id,usuario);
     }
 
-    @GetMapping //http://localhost:8080/usuarios?id=021
-    public String getUser(@RequestParam(value = "id", required = false) String id,
-                          @RequestHeader String session_id) throws JSONException {
-        User session_user = db.returnUser(session_id);
-        if (id == null) {
-            if(check.checkAdmin(session_user)){
+    @PutMapping("/{id}")
+    public void changeAnotherUser(@PathVariable("id") Integer id,
+                                  @RequestHeader Integer session_id,
+                                  @RequestBody Usuario usuario) {
 
-                System.out.println("GetAll!");
-                System.out.println(db.getAllUsers());
-                JSONObject jj = new JSONObject();
-                for (User user: db.getAllUsers()) {
-                    if(check.checkUsuario(user)){
-                        jj.put(user.getId(),user.getAll());
-                    }
-                }
-                return jj.toString();
-            }
-        } else {
-            if(check.checkAdmin(session_user) || session_id.equals(id)){
-
-                System.out.println("Return User --> " + " ID = " + id);
-                JSONObject one = new JSONObject();
-                User user = db.returnUser(id);
-                one.put(user.getId(),user.getAll());
-                return one.toString();
-            }
+        if(adminService.getAdmin(session_id).isPresent()){
+            usuarioService.update(id,usuario);
+            System.out.println("Changing account ID --> +" + id + " by the Admin " + session_id);
         }
-        return "Not Authorized";
+    }
+
+    @GetMapping("/me") //http://localhost:8080/usuarios/me
+    public Optional<Usuario> getMyUser(@RequestHeader Integer session_id)  {
+        return usuarioService.getUser(session_id);
+    }
+
+    @GetMapping("/search") //http://localhost:8080/usuarios/me
+    public List<Usuario> getMyUserByName(@RequestParam String name)  {
+        return usuarioService.search(name);
+    }
+    @GetMapping //http://localhost:8080/usuarios?id=021
+    public Optional<Usuario> getAnotherUser(@RequestParam(value = "id", required = true) Integer id,
+                                    @RequestHeader Integer session_id)  {
+       if( adminService.getAdmin(session_id).isPresent() ){
+           return usuarioService.getUser(id);
+        }
+        return usuarioService.getUser(-1);
+    }
+
+    @DeleteMapping("/me") //http://localhost:8080/usuarios/me
+    public void deleteMyUser(@RequestHeader("session_id") Integer session_id) {
+
+            usuarioService.delete(session_id);
+            System.out.println("User Delete itself--> " + " ID = " + session_id);
+
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("id") String id,
-                           @RequestHeader("session_id") String session_id) {
+    public void deleteAnotherUser(@PathVariable("id") Integer id,
+                                  @RequestHeader("session_id") Integer session_id) {
 
-        User user = db.returnUser(session_id);
-        if(check.checkAdmin(user)){
-            db.deleteUser(id);
+        if( adminService.getAdmin(session_id).isPresent() ){
+            usuarioService.delete(id);
             System.out.println("Admin Delete --> " + " ID = " + id);
-        }
-        if(user.getId().equals(id)){
-            db.deleteUser(id);
-            System.out.println("User Delete itself--> " + " ID = " + id);
         }
 
     }
+
 }
