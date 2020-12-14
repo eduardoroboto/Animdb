@@ -1,26 +1,63 @@
 package com.mdb.Animdb.model.users;
 
-import com.mdb.Animdb.model.productions.Production;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.mdb.Animdb.model.objects.Playlist;
+import javax.persistence.*;
+import java.util.List;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
+@Table(name = "usuario")
+@Entity
 public class Usuario implements User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private String name;
     private String email;
-    private String id;
     private String password;
-    private Map<String, ArrayList<String> > playlists = new HashMap<String,ArrayList<String>>();
 
-    public Usuario(String name, String email, String id, String password) {
-        this.name = name;
-        this.email = email;
+    @OneToMany(mappedBy = "usuarioId")
+    private List<Playlist> playlists;
+
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(List<Playlist> playlists) {
+        this.playlists = playlists;
     }
 
     public String toString() {
@@ -31,78 +68,6 @@ public class Usuario implements User {
                 ", password='" + password + '\'' +
                 ", playlists=" + playlists +
                 '}';
-    }
-    public JSONObject getAll()  throws JSONException {
-
-        JSONObject seriesJson = new JSONObject();
-        seriesJson.put("name",name);
-        seriesJson.put("email",email);
-        seriesJson.put("id",id);
-        seriesJson.put("password" , password);
-        seriesJson.put("playlist" , playlists);
-
-        return seriesJson;
-    }
-
-
-public String[] getCredentials(){
-        String credentials[] = {email,password};
-        return credentials;
-}
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-
-    @Override
-    public void createList(String name) {
-
-        this.playlists.put(name,new ArrayList<String>());
-
-    }
-
-    public Map<String, ArrayList<String>> returnAllPlaylist(){
-        return this.playlists;
-    }
-
-    public void deletePlaylist(String name){
-        playlists.remove(name);
-    }
-
-    public void resetPlaylist(String name){
-        deletePlaylist(name);
-        createList(name);
-    }
-
-    public void renamePlaylist(String old_name, String new_name){
-        createList(new_name);
-        for (String production : this.playlists.get(old_name)){
-            this.playlists.get(new_name).add(production);
-        }
-        deletePlaylist(old_name);
-    }
-
-    public ArrayList<String> returnPlaylist(String name){
-       return this.playlists.get(name);
-    }
-
-    public void removeProductionOnPlaylist(String playlist_name,String title){
-        ArrayList<String> playlist = this.playlists.get(playlist_name);
-        playlist.remove(title);
-    }
-
-    @Override
-    public void addProductions(String listName, Production... productions) {
-        for (Production production : productions){
-            this.playlists.get(listName).add(production.getTitle());
-        }
-    }
-    public void addProductions(String listName, String... titles) {
-        for (String title :  titles){
-            this.playlists.get(listName).add(title);
-        }
     }
 }
 
