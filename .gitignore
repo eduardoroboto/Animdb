@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ## PYTHON #
-/__pycache__/*
+__pycache__/
